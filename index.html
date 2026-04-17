@@ -1,0 +1,2186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Python 1D Lists — Interactive Lesson</title>
+<style>
+/* =====================================================================
+   EDITORIAL — Master Theme
+   ---------------------------------------------------------------------
+   Aesthetic direction : editorial (Linear × Vercel · cool slate)
+   Font pairing        : Fraunces (italic display serif)  ·  Geist (body)
+                         ·  Geist Mono (code)
+   Primary palette     : #0e1014 slate bg · #e8ecf2 ink · #7c5cff indigo accent
+   Light mode          : #eef1f6 mist · #0f172a slate · #5b3fd6 indigo
+   Secondary tokens    : #34d399 success · #f43f5e rose · #38bdf8 sky
+                         · #c084fc violet · #fbbf24 gold
+   ===================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500;1,9..144,600;1,9..144,700;1,9..144,800&family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap');
+
+/* ----------  DESIGN TOKENS  ---------- */
+:root {
+  /* palette — DARK (default) · cool slate + electric indigo */
+  --bg:            #0e1014;     /* deep slate, very slight blue */
+  --bg-1:          #161922;     /* card surface */
+  --bg-2:          #1d212c;     /* raised surface */
+  --bg-3:          #262b38;     /* chip / badge bg */
+  --line:          rgba(148,163,184,.10);
+  --line-2:        rgba(148,163,184,.20);
+  --line-strong:   rgba(148,163,184,.36);
+
+  --fg:            #e8ecf2;     /* cool white */
+  --fg-1:          #c7ceda;
+  --fg-2:          #9098a6;
+  --fg-3:          #6b7282;
+  --fg-4:          #4a5061;
+
+  --accent:        #7c5cff;     /* electric indigo */
+  --accent-hi:     #9a80ff;
+  --accent-lo:     #5a3ed9;
+  --success:       #34d399;     /* emerald */
+  --danger:        #f43f5e;     /* rose */
+  --info:          #38bdf8;     /* sky */
+  --violet:        #c084fc;
+  --gold:          #fbbf24;
+
+  /* spacing — 8px grid */
+  --s-0: 2px;  --s-1: 4px;   --s-2: 8px;   --s-3: 12px;
+  --s-4: 16px; --s-5: 24px;  --s-6: 32px;  --s-7: 48px;
+  --s-8: 64px; --s-9: 96px;
+
+  /* type */
+  --f-display: 'Fraunces', ui-serif, Georgia, serif;
+  --f-body:    'Geist', ui-sans-serif, system-ui, sans-serif;
+  --f-mono:    'Geist Mono', ui-monospace, 'JetBrains Mono', monospace;
+
+  --t-xs:  clamp(11px, .68vw, 12px);
+  --t-sm:  clamp(12px, .78vw, 13px);
+  --t-md:  clamp(13px, .9vw,  14px);
+  --t-lg:  clamp(15px, 1.1vw, 17px);
+  --t-xl:  clamp(20px, 1.6vw, 24px);
+  --t-2xl: clamp(28px, 3vw,   44px);
+  --t-3xl: clamp(40px, 5.2vw, 76px);
+
+  /* radii */
+  --r-xs: 4px; --r-sm: 6px; --r-md: 10px; --r-lg: 14px;
+  --r-xl: 20px; --r-2xl: 28px; --r-full: 999px;
+
+  /* shadows */
+  --sh-hair:  0 1px 0 rgba(255,255,255,.04) inset;
+  --sh-1:     0 1px 2px rgba(0,0,0,.4);
+  --sh-2:     0 14px 36px -18px rgba(0,0,0,.9), 0 0 0 1px var(--line);
+  --sh-3:     0 28px 60px -20px rgba(0,0,0,.95), 0 0 0 1px var(--line);
+  --sh-accent: 0 14px 34px -14px rgba(255,107,44,.55);
+
+  /* motion */
+  --e:        cubic-bezier(.2,.8,.2,1);
+  --e-out:    cubic-bezier(.16,1,.3,1);
+  --d-fast:   160ms;
+  --d-med:    240ms;
+  --d-slow:   420ms;
+}
+
+/* Light mode — toggled via `body.light` · cool mist + electric indigo */
+body.light {
+  --bg:            #eef1f6;     /* cool mist (not cream!) */
+  --bg-1:          #ffffff;
+  --bg-2:          #e4e8ef;
+  --bg-3:          #d6dbe6;
+  --line:          rgba(15,23,42,.09);
+  --line-2:        rgba(15,23,42,.18);
+  --line-strong:   rgba(15,23,42,.36);
+
+  --fg:            #0f172a;     /* slate-900 */
+  --fg-1:          #1e293b;
+  --fg-2:          #475569;
+  --fg-3:          #64748b;
+  --fg-4:          #94a3b8;
+
+  --accent:        #5b3fd6;     /* deep indigo for readability on light */
+  --accent-hi:     #7c5cff;
+  --accent-lo:     #4030a8;
+  --success:       #059669;
+  --danger:        #e11d48;
+  --info:          #0284c7;
+  --violet:        #7c3aed;
+  --gold:          #d97706;
+}
+
+/* ----------  BASE  ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  padding: var(--s-5) var(--s-5) var(--s-5) calc(232px + var(--s-5));
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--f-body);
+  font-size: var(--t-md);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'ss01';
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* atmospheric gradient glow (dark default) — indigo + sky + rose */
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(900px 500px at 88% -10%, rgba(124,92,255,.14), transparent 60%),
+    radial-gradient(800px 500px at -8% 110%, rgba(56,189,248,.08), transparent 60%),
+    radial-gradient(600px 400px at 50% 50%, rgba(244,63,94,.04), transparent 60%);
+}
+body.light::before {
+  background:
+    radial-gradient(900px 500px at 88% -10%, rgba(91,63,214,.08), transparent 60%),
+    radial-gradient(800px 500px at -8% 110%, rgba(56,189,248,.08), transparent 60%),
+    radial-gradient(600px 400px at 50% 50%, rgba(225,29,72,.04), transparent 60%);
+}
+
+/* texture overlay */
+body::after {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  opacity: .45; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .18 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+body.light::after {
+  opacity: .3; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .12 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+body > * { position: relative; z-index: 1; }
+
+/* ----------  TYPOGRAPHY  ---------- */
+/* Title — pinned top of left sidenav */
+h1 {
+  position: fixed;
+  top: var(--s-5);
+  left: var(--s-5);
+  width: 210px;
+  margin: 0;
+  padding: 0 var(--s-3);
+  font-family: var(--f-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: var(--t-lg);
+  line-height: 1.1;
+  letter-spacing: -.025em;
+  color: var(--fg);
+  text-align: left;
+  z-index: 40;
+  pointer-events: none;
+}
+h1 .accent, h1 em, h1 i { color: var(--accent); font-style: italic; }
+
+h2 { font-family: var(--f-display); font-style: italic; font-weight: 500; letter-spacing: -.02em; }
+h3 { font-family: var(--f-body); font-size: 11px; font-weight: 500; text-transform: uppercase;
+     letter-spacing: .16em; color: var(--fg-2); margin: 0 0 var(--s-4); }
+h4 { font-family: var(--f-body); font-size: var(--t-md); font-weight: 500;
+     letter-spacing: -.005em; margin: var(--s-4) 0 var(--s-2); color: var(--fg); }
+
+/* Subtitle — removed from flow; becomes sidebar caption */
+.subtitle {
+  position: fixed;
+  top: calc(var(--s-5) + 42px);
+  left: var(--s-5);
+  width: 210px;
+  margin: 0;
+  padding: 0 var(--s-3);
+  font: 400 var(--t-xs) var(--f-body);
+  color: var(--fg-3);
+  letter-spacing: .02em;
+  line-height: 1.4;
+  text-align: left;
+  z-index: 40;
+  pointer-events: none;
+}
+
+p { margin: var(--s-2) 0; color: var(--fg-1); }
+ul { margin: var(--s-2) 0 var(--s-2) var(--s-4); padding: 0; color: var(--fg-1); }
+li { margin: 4px 0; }
+code { font-family: var(--f-mono); font-size: .92em; color: var(--accent-hi); }
+body.light code { color: var(--accent-lo); }
+
+a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent;
+    transition: border-color var(--d-fast); }
+a:hover { border-bottom-color: var(--accent); }
+
+/* ----------  NAVIGATION / TABS (vertical sidenav)  ---------- */
+.tabs {
+  position: fixed;
+  left: var(--s-5);
+  top: calc(var(--s-5) + 94px);
+  width: 210px;
+  max-height: calc(100vh - var(--s-5) * 2 - 94px);
+  overflow-y: auto;
+  z-index: 40;
+
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--s-2);
+  background: color-mix(in srgb, var(--bg-1) 80%, transparent);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  margin: 0;
+}
+
+.tab {
+  display: block;
+  width: 100%;
+  padding: 9px 14px;
+  text-align: left;
+  background: transparent; border: 0;
+  color: var(--fg-2);
+  font: 500 var(--t-sm)/1.2 var(--f-body);
+  letter-spacing: -.005em;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: color var(--d-fast) var(--e),
+              background var(--d-fast) var(--e),
+              padding-left var(--d-fast) var(--e);
+  white-space: nowrap;
+  position: relative;
+}
+.tab:hover { color: var(--fg); background: var(--bg-2); }
+.tab.active {
+  color: var(--bg);
+  background: var(--fg);
+}
+.tab.active::before {
+  content: ''; position: absolute;
+  left: -2px; top: 6px; bottom: 6px; width: 2px;
+  background: var(--accent);
+  border-radius: var(--r-full);
+}
+
+/* Single-page files (no .tabs) — reclaim sidebar space */
+body:not(:has(.tabs)) {
+  padding-left: var(--s-5);
+}
+body:not(:has(.tabs)) h1 {
+  position: relative; top: 0; left: 0; width: auto;
+  text-align: center; font-size: var(--t-xl); padding: 0;
+  margin: 0 0 var(--s-2); pointer-events: auto;
+}
+body:not(:has(.tabs)) .subtitle {
+  position: relative; top: 0; left: 0; width: auto;
+  text-align: center; padding: 0; margin: 0 auto var(--s-4);
+  font-size: var(--t-sm); max-width: 62ch; pointer-events: auto;
+}
+
+/* Mobile: collapse sidenav to topbar */
+@media (max-width: 900px) {
+  body { padding: var(--s-3) var(--s-3) var(--s-5); }
+  h1 { position: relative; top: 0; left: 0; width: auto; text-align: center;
+       font-size: var(--t-xl); padding: 0; margin: 0 0 4px; pointer-events: auto; }
+  .subtitle { position: relative; top: 0; left: 0; width: auto;
+       text-align: center; padding: 0; margin: 0 auto var(--s-3); pointer-events: auto; }
+  .tabs {
+    position: relative; left: 0; top: 0; width: 100%;
+    max-height: none; overflow: visible;
+    flex-direction: row; flex-wrap: wrap; justify-content: center;
+    border-radius: var(--r-full); margin: 0 auto var(--s-4);
+  }
+  .tab { width: auto; text-align: center; padding: 7px 14px; border-radius: var(--r-full); }
+  .tab.active::before { display: none; }
+}
+
+/* ----------  PANELS / LAYOUT  ---------- */
+/* Tab panels: only hide panels that are siblings of a .tabs element */
+.tabs ~ .panel { display: none; max-width: 1400px; margin: 0 auto; width: 100%; }
+.tabs ~ .panel.active {
+  display: grid; gap: var(--s-4);
+  grid-template-columns: 1.05fr 1fr;
+  animation: enter .5s var(--e-out) both;
+}
+.tabs ~ .panel.single.active { grid-template-columns: 1fr; }
+
+@media (max-width: 960px) {
+  .tabs ~ .panel.active { grid-template-columns: 1fr; }
+}
+
+/* Generic layout grid (3-col: code · flow · vars) — loops, operators, py_to_flowchart */
+.layout {
+  display: grid; gap: var(--s-4);
+  grid-template-columns: 1fr 1.2fr 320px;
+  max-width: 1500px; margin: 0 auto;
+  min-height: 0;
+  animation: enter .5s var(--e-out) both;
+}
+@media (max-width: 1100px) { .layout { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 760px)  { .layout { grid-template-columns: 1fr; } }
+
+/* process_states structural containers */
+.container {
+  display: grid; gap: var(--s-4);
+  grid-template-columns: 1.55fr 1fr;
+  max-width: 1500px; margin: 0 auto;
+  min-height: 0;
+}
+@media (max-width: 960px) { .container { grid-template-columns: 1fr; } }
+.left-col { display: flex; flex-direction: column; gap: var(--s-3); min-height: 0; }
+.sidebar  { display: flex; flex-direction: column; gap: var(--s-3); min-height: 0; }
+.sidebar .panel {
+  background: linear-gradient(180deg, var(--bg-1), var(--bg));
+  border: 1px solid var(--line); border-radius: var(--r-lg);
+  padding: var(--s-4);
+}
+.sidebar .panel h3 { margin: 0 0 var(--s-3); }
+.sidebar .panel.term-panel { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.diagram  {
+  background: linear-gradient(180deg, var(--bg-1), var(--bg));
+  border: 1px solid var(--line); border-radius: var(--r-lg);
+  padding: var(--s-4); flex: 1; min-height: 320px; position: relative;
+}
+.diagram svg { width: 100%; height: 100%; min-height: 300px; }
+#notify, .board-wrap {
+  background: linear-gradient(180deg, var(--bg-1), var(--bg));
+  border: 1px solid var(--line); border-radius: var(--r-lg);
+  padding: var(--s-4);
+}
+.ops { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-2); }
+.ops button { width: 100%; padding: 8px 12px; font: 500 var(--t-xs) var(--f-body);
+  background: var(--bg-2); color: var(--fg-1); border: 1px solid var(--line-2);
+  border-radius: var(--r-sm); cursor: pointer;
+  transition: all var(--d-fast) var(--e); }
+.ops button:hover:not(:disabled) { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.ops button:disabled { opacity: .3; cursor: not-allowed; }
+.ops button.good { background: var(--success); color: #0a0a0a; border-color: transparent; }
+.ops button.danger { background: var(--danger); color: #fff; border-color: transparent; }
+
+/* Process "status" info pill (not alert-style) */
+.sidebar .status, .status.pill {
+  display: flex; justify-content: space-between; padding: 6px 10px;
+  background: var(--bg-1); border: 1px solid var(--line);
+  border-radius: var(--r-sm); border-left: 1px solid var(--line);
+  font: 500 var(--t-xs) var(--f-mono); color: var(--fg-1);
+}
+.sidebar .status span:last-child { color: var(--accent); font-weight: 500; }
+
+/* py_to_flowchart — flow wrap */
+.flow-wrap { position: relative; overflow: auto; flex: 1; min-height: 0; border-radius: var(--r-md); }
+
+/* legacy decorative background from earlier iterations (kept inert) */
+.mat-bg { display: none; }
+
+/* py_to_flowchart defs icons */
+svg.flow { width: 100%; flex: 1; min-height: 0; display: block;
+  background: linear-gradient(180deg, var(--bg-1), var(--bg));
+  border: 1px solid var(--line); border-radius: var(--r-md); }
+
+/* ---------- LINUX NETWORK helpers ---------- */
+.layout.three { display: grid; gap: var(--s-4); grid-template-columns: 1.3fr 1fr 1fr;
+  max-width: 1500px; margin: 0 auto; }
+@media (max-width: 1100px) { .layout.three { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 760px)  { .layout.three { grid-template-columns: 1fr; } }
+
+svg.diag {
+  width: 100%; display: block;
+  background: linear-gradient(180deg, var(--bg-1), var(--bg));
+  border: 1px solid var(--line); border-radius: var(--r-md);
+}
+
+.card.scroll { overflow-y: auto; }
+
+.btn.danger { background: var(--danger); color: #fff; }
+.btn.danger:hover { background: var(--accent); }
+
+.cmd    { color: var(--accent-hi); }
+.prompt { color: var(--info); }
+.ok     { color: var(--success); }
+.err    { color: var(--danger); }
+.info   { color: var(--info); }
+.hl     { color: var(--accent); font-weight: 500; }
+.dim    { color: var(--fg-3); }
+
+.host-row {
+  display: flex; align-items: center; gap: var(--s-3);
+  padding: 8px 12px; background: var(--bg-1);
+  border: 1px solid var(--line); border-radius: var(--r-sm);
+  font: 500 12.5px var(--f-mono);
+  margin: 4px 0;
+}
+
+.ports-table { width: 100%; border-collapse: separate; border-spacing: 0;
+  font: 500 12px var(--f-mono); }
+.ports-table th, .ports-table td {
+  padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: left;
+}
+.ports-table th {
+  font: 500 10px var(--f-body);
+  text-transform: uppercase; letter-spacing: .14em;
+  color: var(--fg-3);
+}
+.ports-table tr:hover td { background: var(--bg-2); }
+
+.rules-list { display: flex; flex-direction: column; gap: 4px; }
+.rules-list > div {
+  padding: 6px 10px; background: var(--bg-1);
+  border: 1px solid var(--line); border-radius: var(--r-sm);
+  font: 500 12px var(--f-mono); color: var(--fg-1);
+}
+
+/* dns-graph */
+.dns-node rect { fill: var(--bg-2); stroke: var(--line-2); stroke-width: 1.2; }
+.dns-node text { fill: var(--fg); font: 500 12px var(--f-body); }
+.dns-node.hl rect { fill: var(--accent); stroke: var(--accent-hi); }
+.dns-node.hl text { fill: #0a0a0a; font-weight: 600; }
+.dns-edge { stroke: var(--fg-4); stroke-width: 1.3; fill: none;
+  transition: all var(--d-med); }
+.dns-edge.active { stroke: var(--accent); stroke-width: 2.2;
+  stroke-dasharray: 6 4; animation: dashflow 900ms linear infinite; }
+
+@keyframes enter { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ----------  CARDS  ---------- */
+.card {
+  position: relative;
+  background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg) 100%);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: var(--s-5);
+  display: flex; flex-direction: column;
+  transition: border-color var(--d-med) var(--e), transform var(--d-med) var(--e);
+  min-height: 0;
+}
+.card::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,.05), transparent 20%);
+}
+.card:hover { border-color: var(--line-2); }
+
+/* ----------  CONTROLS / ROWS  ---------- */
+.row, .controls {
+  display: flex; gap: var(--s-2); flex-wrap: wrap; align-items: center;
+  margin: var(--s-2) 0;
+}
+
+/* ----------  BUTTONS  ---------- */
+button.btn, .btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px;
+  background: var(--fg); color: var(--bg);
+  border: 1px solid transparent;
+  border-radius: var(--r-full);
+  font: 500 var(--t-sm)/1 var(--f-body);
+  letter-spacing: -.005em;
+  cursor: pointer;
+  transition: background var(--d-fast) var(--e),
+              color var(--d-fast) var(--e),
+              transform var(--d-fast) var(--e),
+              border-color var(--d-fast);
+}
+button.btn:hover, .btn:hover { background: var(--accent); color: var(--bg); transform: translateY(-1px); }
+button.btn:active { transform: translateY(0); }
+
+button.btn.go { background: var(--accent); color: var(--bg); }
+button.btn.go:hover { background: var(--accent-hi); }
+
+button.btn.alt { background: transparent; color: var(--fg); border-color: var(--line-strong); }
+button.btn.alt:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+
+button.btn.warn { background: var(--gold); color: var(--bg); }
+button.btn.warn:hover { background: var(--accent); color: var(--bg); }
+
+button.btn:disabled { opacity: .35; cursor: not-allowed; transform: none; }
+
+/* generic button (process_states) */
+button {
+  font-family: var(--f-body);
+}
+button.good   { background: var(--success) !important; color: #000 !important; border-color: transparent !important; }
+button.danger { background: var(--danger) !important; color: #fff !important; border-color: transparent !important; }
+
+/* ----------  MODE CHIPS  ---------- */
+.modes { display: flex; gap: var(--s-1); flex-wrap: wrap; margin: 6px 0 var(--s-3); }
+.mode-chip {
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid var(--line-2);
+  color: var(--fg-1);
+  font: 500 var(--t-xs)/1 var(--f-body);
+  letter-spacing: -.005em;
+  border-radius: var(--r-full);
+  cursor: pointer;
+  transition: all var(--d-fast) var(--e);
+  white-space: nowrap;
+}
+.mode-chip:hover { color: var(--fg); border-color: var(--fg-3); }
+.mode-chip.active { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+
+/* ----------  INPUTS  ---------- */
+input[type=text], input[type=number], select {
+  font: 400 var(--t-sm) var(--f-body);
+  padding: 8px 12px;
+  background: var(--bg-1);
+  color: var(--fg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  transition: border-color var(--d-fast), background var(--d-fast);
+}
+input[type=text]:focus, input[type=number]:focus, select:focus {
+  outline: none; border-color: var(--accent);
+  background: var(--bg-2);
+}
+input[type=number] { width: 88px; font-family: var(--f-mono); }
+
+textarea {
+  font: 400 var(--t-sm) var(--f-body);
+  padding: var(--s-3);
+  background: var(--bg-1);
+  color: var(--fg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  resize: vertical;
+}
+textarea:focus { outline: none; border-color: var(--accent); }
+
+textarea.code, textarea.sentence {
+  font-family: var(--f-mono);
+  background: #060606;
+  color: #e7e4df;
+  line-height: 1.65;
+  padding: var(--s-4);
+  border-radius: var(--r-md);
+}
+body.light textarea.code, body.light textarea.sentence {
+  background: #171719; color: #f0ece5; border-color: rgba(0,0,0,.12);
+}
+
+label, label.inline {
+  font: 500 var(--t-xs) var(--f-body);
+  color: var(--fg-2);
+  letter-spacing: -.005em;
+  display: flex; align-items: center; gap: 6px;
+}
+
+input[type=range] {
+  appearance: none; -webkit-appearance: none;
+  width: 140px; height: 4px;
+  background: var(--line-2); border-radius: var(--r-full);
+  cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  appearance: none; width: 14px; height: 14px; border-radius: 50%;
+  background: var(--accent); border: 2px solid var(--bg);
+  box-shadow: 0 2px 6px rgba(0,0,0,.6);
+}
+input[type=range]::-moz-range-thumb {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--accent); border: 2px solid var(--bg);
+}
+
+/* ----------  CODE BLOCKS  ---------- */
+pre, pre.code {
+  background: #0d0d10;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: var(--s-4);
+  font: 400 13px/1.7 var(--f-mono);
+  color: #e7e4df;
+  white-space: pre;
+  overflow: auto;
+  margin: var(--s-2) 0;
+  tab-size: 4;
+}
+body.light pre, body.light pre.code {
+  background: #17171a; color: #f0ece5; border-color: rgba(0,0,0,.1);
+}
+
+pre.code .kw,  pre .kw   { color: #f87171; }   /* rose */
+pre.code .fn,  pre .fn   { color: #60a5fa; }   /* sky */
+pre.code .num, pre .num  { color: #c084fc; }   /* violet */
+pre.code .str, pre .str  { color: #34d399; }   /* emerald */
+pre.code .cm,  pre .cm   { color: var(--fg-4); font-style: italic; }
+
+pre.code .ln, .codeline {
+  display: block;
+  padding: 0 var(--s-3);
+  margin-left: calc(var(--s-3) * -1);
+  border-left: 2px solid transparent;
+}
+pre.code .ln.active, .codeline.hl {
+  background: rgba(255,107,44,.08);
+  border-left-color: var(--accent);
+  color: var(--accent-hi);
+}
+
+/* ----------  OUTPUT / FEED / TERMINAL  ---------- */
+.output, .feed {
+  font: 400 12.5px/1.55 var(--f-mono);
+  background: #0d0d10;
+  color: var(--success);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: var(--s-3) var(--s-4);
+  max-height: 220px; overflow: auto;
+  margin-top: var(--s-3);
+  min-height: 44px;
+  white-space: pre-wrap;
+}
+body.light .output, body.light .feed { background: #17171a; }
+.output .err { color: var(--danger); }
+.output .inp { color: var(--gold); }
+.feed .line { display: block; animation: enter 220ms var(--e-out) both; }
+.feed .line.hl { color: var(--accent-hi); font-weight: 500; }
+
+.terminal {
+  background: #050507; border: 1px solid var(--line);
+  border-radius: var(--r-md); padding: var(--s-3);
+  font: 400 12px/1.55 var(--f-mono); color: var(--success);
+  overflow-y: auto;
+}
+.terminal .prompt { color: var(--info); }
+.terminal .err    { color: var(--danger); }
+.terminal .ok     { color: var(--gold); }
+
+/* ----------  TIPS / WARNINGS / STATUS  ---------- */
+.tip, .warn, .status {
+  font: 400 var(--t-sm)/1.55 var(--f-body);
+  padding: var(--s-3);
+  border-radius: var(--r-sm);
+  border-left: 2px solid;
+  margin: var(--s-2) 0;
+}
+.tip  { background: color-mix(in srgb, var(--info) 8%, transparent);
+        border-color: var(--info); color: var(--fg-1); }
+.warn { background: color-mix(in srgb, var(--danger) 8%, transparent);
+        border-color: var(--danger); color: var(--fg-1); }
+
+.status { background: var(--bg-1); border-color: var(--info); color: var(--fg-1); }
+.status.ok   { border-color: var(--success); }
+.status.err  { border-color: var(--danger); }
+.status.done { border-color: var(--accent); }
+.status.true  { border-color: var(--success); }
+.status.false { border-color: var(--danger); }
+
+/* ----------  BADGES  ---------- */
+.badge {
+  display: inline-block;
+  font: 500 10px/1 var(--f-mono);
+  padding: 5px 9px;
+  border-radius: var(--r-full);
+  background: var(--bg-3);
+  color: var(--fg-1);
+  border: 1px solid var(--line);
+  margin-left: var(--s-2);
+  letter-spacing: .04em;
+  vertical-align: middle;
+}
+
+/* ----------  KEY-VALUE (DICT)  ---------- */
+.kv-wrap { display: flex; flex-direction: column; gap: var(--s-2);
+  max-height: 340px; overflow: auto; padding: 2px; }
+.kv-row {
+  display: flex; align-items: center; gap: var(--s-3);
+  padding: var(--s-2) var(--s-3);
+  background: var(--bg-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  font: 500 13px var(--f-mono);
+  transition: border-color var(--d-fast), background var(--d-fast);
+  animation: enter 220ms var(--e-out) both;
+}
+.kv-row:hover { border-color: var(--line-2); }
+.kv-row.hl { border-color: var(--accent); background: rgba(255,107,44,.05); }
+.kv-row .key { color: var(--accent); min-width: 110px; }
+.kv-row .arrow { color: var(--fg-3); }
+.kv-row .val { color: var(--success); flex: 1; word-break: break-all; }
+.kv-row button.x {
+  background: transparent; color: var(--danger);
+  border: 1px solid var(--line-2); border-radius: var(--r-full);
+  width: 22px; height: 22px; padding: 0; cursor: pointer; font-size: 12px;
+}
+.kv-row button.x:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+
+/* ----------  LIST ITEMS (1D)  ---------- */
+.listviz { display: flex; gap: var(--s-2); flex-wrap: wrap; margin: var(--s-2) 0;
+  position: relative; padding: 4px 0; }
+.litem {
+  min-width: 56px; position: relative;
+  padding: var(--s-3);
+  background: var(--bg-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  text-align: center;
+  font: 500 13px/1 var(--f-mono);
+  color: var(--fg);
+  transition: transform var(--d-fast) var(--e), border-color var(--d-fast);
+  animation: enter 220ms var(--e-out) both;
+}
+.litem:hover { transform: translateY(-2px); border-color: var(--accent); }
+.litem.hl { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+.litem.sliced { border-color: var(--success); color: var(--success); }
+.litem.appearing { animation: enter 320ms var(--e-out) both; }
+.litem.inserting { animation: insert 320ms var(--e-out) both; }
+.litem.removing  { animation: poof 360ms var(--e) forwards; }
+.litem .ix {
+  position: absolute; bottom: -16px; left: 0; right: 0;
+  font: 500 10px var(--f-mono); color: var(--fg-3);
+  letter-spacing: .02em;
+}
+.litem .neg {
+  position: absolute; top: -16px; left: 0; right: 0;
+  font: 500 10px var(--f-mono); color: var(--danger);
+}
+.listviz.margined { margin: 22px 4px 26px; }
+
+@keyframes insert { from { transform: translateY(-10px) scale(.9); opacity: 0; }
+                    to   { transform: translateY(0) scale(1); opacity: 1; } }
+@keyframes poof   { from { transform: scale(1); opacity: 1; filter: blur(0); }
+                    to   { transform: scale(1.4); opacity: 0; filter: blur(6px); } }
+@keyframes pop    { 0% { transform: scale(.6); opacity: 0; }
+                    60% { transform: scale(1.1); }
+                    100% { transform: scale(1); opacity: 1; } }
+.bump { animation: pop 320ms var(--e-out) both; }
+
+/* ----------  SET CHIPS  ---------- */
+.setviz { display: flex; gap: 6px; flex-wrap: wrap; margin: var(--s-2) 0; min-height: 36px; }
+.schip {
+  padding: 6px 12px; border-radius: var(--r-full);
+  background: var(--bg-1); border: 1px solid var(--line-2);
+  font: 500 12px/1 var(--f-mono); color: var(--fg);
+  animation: enter 240ms var(--e-out) both;
+  transition: all var(--d-fast) var(--e);
+}
+.schip:hover { border-color: var(--accent); }
+.schip.hl     { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+.schip.common { background: var(--gold);   color: #111;     border-color: var(--gold); }
+.schip.a      { border-color: var(--info);   color: var(--info); }
+.schip.b      { border-color: var(--violet); color: var(--violet); }
+
+/* ----------  VAR BOXES  ---------- */
+.vars { display: flex; gap: var(--s-2); flex-wrap: wrap; margin-top: var(--s-3); }
+.var-box {
+  background: var(--bg-1);
+  padding: 6px 12px;
+  border: 1px solid var(--success);
+  border-radius: var(--r-sm);
+  min-width: 64px; text-align: center;
+  transition: transform var(--d-fast);
+}
+.var-box:hover { transform: translateY(-1px); }
+.var-box .name { font: 500 10px/1 var(--f-body); color: var(--fg-3);
+  text-transform: uppercase; letter-spacing: .1em; }
+.var-box .val  { font: 500 15px/1 var(--f-mono); color: var(--fg); margin-top: 4px; }
+
+/* ----------  BIG-VAR CARDS  ---------- */
+.big-vars { display: flex; gap: var(--s-3); flex-wrap: wrap; margin: var(--s-3) 0; }
+.big-var {
+  flex: 1; min-width: 120px;
+  padding: var(--s-3) var(--s-4);
+  background: var(--bg-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  transition: border-color var(--d-fast);
+  animation: enter 280ms var(--e-out) both;
+}
+.big-var:hover { border-color: var(--line-2); }
+.big-var .lbl {
+  font: 500 10px/1 var(--f-body);
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--fg-3); margin-bottom: 6px;
+}
+.big-var .v {
+  font: 500 22px/1.1 var(--f-mono);
+  letter-spacing: -.02em;
+  color: var(--fg);
+  word-break: break-all;
+}
+
+/* ----------  TOAST  ---------- */
+.toast-wrap {
+  position: fixed; top: calc(var(--s-5) + 52px); right: var(--s-5); z-index: 60;
+  display: flex; flex-direction: column; gap: var(--s-2);
+  max-width: 340px;
+}
+.toast {
+  padding: var(--s-3) var(--s-4);
+  background: var(--fg); color: var(--bg);
+  border-radius: var(--r-sm);
+  font: 500 var(--t-sm) var(--f-body);
+  letter-spacing: -.005em;
+  box-shadow: 0 24px 48px -20px rgba(0,0,0,.95);
+  animation: slideIn 260ms var(--e-out) both;
+}
+.toast.err  { background: var(--danger); color: #fff; }
+.toast.info { background: var(--info);   color: #fff; }
+@keyframes slideIn { from { transform: translateX(30px); opacity: 0; }
+                     to   { transform: translateX(0); opacity: 1; } }
+
+/* ----------  THEME TOGGLE  ---------- */
+.theme-toggle {
+  position: fixed; top: var(--s-4); right: var(--s-4); z-index: 50;
+  width: 40px; height: 40px;
+  background: var(--bg-1); color: var(--fg);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-full);
+  cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--d-fast);
+}
+.theme-toggle:hover { background: var(--fg); color: var(--bg); transform: rotate(15deg); }
+
+/* ----------  TABLES  ---------- */
+table.tbl { width: 100%; border-collapse: separate; border-spacing: 0;
+  font: 500 var(--t-sm) var(--f-mono); margin-top: var(--s-3); }
+table.tbl th, table.tbl td {
+  padding: 8px 12px; border-bottom: 1px solid var(--line); text-align: center;
+}
+table.tbl th {
+  font: 500 10px var(--f-body);
+  text-transform: uppercase; letter-spacing: .14em;
+  color: var(--fg-3);
+}
+table.tbl tr.hl td { background: rgba(255,107,44,.08); color: var(--accent-hi); }
+
+/* ----------  PIPELINE / STAGES  ---------- */
+.pipeline { display: flex; gap: var(--s-2); flex-wrap: wrap; align-items: center; margin: var(--s-2) 0; }
+.pipeline .stage {
+  background: var(--bg-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 8px 12px; min-width: 84px;
+  font: 500 12.5px var(--f-mono); color: var(--fg);
+}
+.pipeline .stage .cap {
+  font: 500 9.5px var(--f-body);
+  text-transform: uppercase; letter-spacing: .14em;
+  color: var(--fg-3); margin-bottom: 4px;
+}
+.pipeline .stage b { color: var(--accent); }
+
+/* ----------  GRID (2D LISTS)  ---------- */
+.grid-wrap { overflow: auto; margin: var(--s-2) 0; padding-bottom: 6px; }
+.grid2d { display: table; border-collapse: separate; border-spacing: 6px; }
+.grow { display: table-row; }
+.grow.pulse { animation: ring 1.4s var(--e) infinite; border-radius: var(--r-sm); }
+@keyframes ring { 0%,100% { box-shadow: 0 0 0 0 rgba(255,107,44,.45); }
+                  50%     { box-shadow: 0 0 0 6px rgba(255,107,44,0); } }
+
+.gcell {
+  display: table-cell; vertical-align: middle;
+  min-width: 56px; height: 44px; padding: 8px 12px;
+  background: var(--bg-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  text-align: center;
+  font: 500 13px/1 var(--f-mono); color: var(--fg);
+  cursor: pointer;
+  transition: all var(--d-fast) var(--e);
+  animation: enter 240ms var(--e-out) both;
+}
+.gcell:hover { border-color: var(--accent); transform: translateY(-1px); }
+.gcell.hl     { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+.gcell.rowhl  { background: color-mix(in srgb, var(--info) 14%, var(--bg-1)); border-color: var(--info); }
+.gcell.colhl  { background: color-mix(in srgb, var(--violet) 14%, var(--bg-1)); border-color: var(--violet); }
+.gcell.done   { background: color-mix(in srgb, var(--success) 10%, var(--bg-1)); border-color: var(--success); }
+
+.rhead, .chead {
+  display: inline-block; min-width: 28px; padding: 4px 8px;
+  background: var(--bg-2); color: var(--fg-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-full);
+  font: 500 10px var(--f-mono);
+}
+.rhead.active { background: var(--info); color: #fff; border-color: var(--info); }
+.chead.active { background: var(--violet); color: #111; border-color: var(--violet); }
+
+/* ----------  VENN ZONES  ---------- */
+.venn-zones { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--s-2);
+  margin: var(--s-3) 0; }
+.vzone {
+  min-height: 90px; padding: var(--s-3);
+  border: 1.5px solid; border-radius: var(--r-md);
+  background: var(--bg-1);
+  transition: all var(--d-fast) var(--e);
+}
+.vzone .lbl { font: 500 10.5px var(--f-body);
+  letter-spacing: .14em; text-transform: uppercase; margin-bottom: 6px; }
+.vzone .items { display: flex; gap: 5px; flex-wrap: wrap; }
+.vzone.a     { border-color: var(--info); }
+.vzone.a .lbl { color: var(--info); }
+.vzone.b     { border-color: var(--violet); }
+.vzone.b .lbl { color: var(--violet); }
+.vzone.inter { border-color: var(--gold); }
+.vzone.inter .lbl { color: var(--gold); }
+.vzone.dim   { opacity: .35; }
+.vzone.glow  { box-shadow: 0 0 0 2px rgba(255,201,74,.25); background: color-mix(in srgb, var(--gold) 5%, var(--bg-1)); }
+
+.venn-preview { width: 100%; max-width: 400px; height: 170px; margin: 0 auto; }
+.venn-preview svg { width: 100%; height: 100%; }
+.venn-preview .zone { fill-opacity: .2; transition: fill-opacity var(--d-med); }
+.venn-preview .zone.on { fill-opacity: .55; }
+
+/* ----------  LETTERS (FREQUENCY)  ---------- */
+.letters-row { display: flex; gap: 6px; flex-wrap: wrap; margin: var(--s-2) 0; }
+.letter {
+  position: relative;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-1);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  color: var(--fg);
+  font: 600 13px var(--f-mono);
+  transition: all var(--d-fast) var(--e);
+  animation: enter 240ms var(--e-out) both;
+}
+.letter.current { background: var(--accent); color: var(--bg); border-color: var(--accent);
+                  transform: translateY(-2px) scale(1.08); }
+.letter.done    { border-color: var(--success); color: var(--success); }
+.letter .sub { position: absolute; bottom: -14px; left: 0; right: 0;
+               font: 500 9px var(--f-mono); color: var(--fg-3); }
+
+/* ----------  DICT BRACE WRAP  ---------- */
+.dict-wrap {
+  margin: var(--s-2) 0;
+  padding: var(--s-3);
+  border-radius: var(--r-md);
+  border: 1px dashed var(--line-2);
+  background: var(--bg-1);
+}
+.dict-wrap .braces {
+  display: flex; align-items: center; gap: var(--s-2);
+  font: 600 22px var(--f-mono); color: var(--accent);
+}
+.dict-wrap .braces .inner { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+
+/* ----------  KEY RESULT BANNER  ---------- */
+.key-result {
+  padding: 12px 14px;
+  border-radius: var(--r-sm);
+  border: 1px solid;
+  margin-top: var(--s-2);
+  font: 500 13px var(--f-mono);
+  line-height: 1.5;
+}
+.key-result.ok  { border-color: var(--success); color: var(--success);
+                  background: color-mix(in srgb, var(--success) 8%, transparent); }
+.key-result.bad { border-color: var(--danger); color: var(--danger);
+                  background: color-mix(in srgb, var(--danger) 8%, transparent); }
+
+/* ----------  LEGEND  ---------- */
+.legend { display: flex; gap: var(--s-3); flex-wrap: wrap; margin-top: var(--s-2);
+  font: 500 10.5px var(--f-body); color: var(--fg-2); letter-spacing: .02em; }
+.legend span { display: flex; align-items: center; gap: 4px; }
+.legend .dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+/* ----------  QUIZ (if present)  ---------- */
+.quiz-q { background: var(--bg-1); border: 1px solid var(--line); border-radius: var(--r-md);
+  padding: var(--s-4); margin-bottom: var(--s-3); }
+.quiz-q h4 { color: var(--accent); margin: 0 0 var(--s-2); }
+.choices { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-2); margin-top: var(--s-2); }
+.choice {
+  padding: 10px 12px;
+  background: var(--bg); border: 1px solid var(--line-2);
+  border-radius: var(--r-sm); cursor: pointer;
+  font: 500 var(--t-sm) var(--f-mono); color: var(--fg);
+  text-align: left; transition: all var(--d-fast) var(--e);
+}
+.choice:hover { border-color: var(--accent); }
+.choice.correct { background: color-mix(in srgb, var(--success) 14%, var(--bg-1));
+                  border-color: var(--success); color: var(--success); }
+.choice.wrong   { background: color-mix(in srgb, var(--danger) 14%, var(--bg-1));
+                  border-color: var(--danger); color: var(--danger); }
+.choice.disabled { pointer-events: none; opacity: .7; }
+.feedback { margin-top: var(--s-2); font: 400 var(--t-sm) var(--f-body); color: var(--fg-2); min-height: 16px; }
+.feedback.ok  { color: var(--success); }
+.feedback.bad { color: var(--danger); }
+.quiz-score { padding: 12px 14px; border-radius: var(--r-md); text-align: center;
+  background: var(--bg-1); border: 1px solid var(--line);
+  font: 500 var(--t-md) var(--f-body); }
+
+/* ----------  SVG FLOWCHART NODES (loops, flowchart, py_to_flowchart, operators)  ---------- */
+svg.flow, .card svg {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  min-height: 0;
+}
+
+.node rect, .node polygon, .node ellipse {
+  transition: all var(--d-med) var(--e);
+  fill: var(--bg-2);
+  stroke: var(--line-2);
+  stroke-width: 1.2;
+}
+.node text {
+  fill: var(--fg); font: 500 13px var(--f-body);
+  pointer-events: none;
+}
+.node.active rect, .node.active polygon, .node.active ellipse {
+  fill: var(--accent) !important;
+  stroke: var(--accent-hi) !important;
+  stroke-width: 2 !important;
+  filter: drop-shadow(0 4px 14px rgba(255,107,44,.45));
+}
+.node.active text { fill: #111 !important; }
+.node.done rect, .node.done polygon, .node.done ellipse {
+  fill: color-mix(in srgb, var(--success) 16%, var(--bg-2)) !important;
+  stroke: var(--success) !important;
+}
+
+.edge {
+  stroke: var(--fg-4); stroke-width: 1.3; fill: none;
+  transition: all var(--d-med);
+}
+.edge.active {
+  stroke: var(--accent); stroke-width: 2.2;
+  filter: drop-shadow(0 0 6px rgba(255,107,44,.45));
+  stroke-dasharray: 6 4; animation: dashflow 900ms linear infinite;
+}
+@keyframes dashflow { to { stroke-dashoffset: -20; } }
+.edge-label { fill: var(--fg-2); font: 500 10.5px var(--f-mono); }
+.edge.lit  { stroke: var(--gold); stroke-width: 2.4; filter: drop-shadow(0 0 4px rgba(255,201,74,.5)); }
+
+/* process_states-specific */
+.state { cursor: pointer; transition: transform var(--d-fast); }
+.state:hover { transform: scale(1.04); }
+.state rect { stroke-width: 2; rx: 10; }
+.state.active rect { filter: drop-shadow(0 0 12px rgba(255,107,44,.7));
+  stroke: var(--accent); stroke-width: 3; }
+.state text { fill: #0a0a0a; font: 600 12.5px var(--f-body); text-anchor: middle; pointer-events: none; }
+.label { fill: var(--fg-2); font: 500 11.5px var(--f-mono); text-anchor: middle; pointer-events: none; }
+.arrow { stroke: var(--line-strong); stroke-width: 1.6; fill: none; }
+.arrow.lit { stroke: var(--gold); stroke-width: 2.2; filter: drop-shadow(0 0 4px rgba(255,201,74,.5)); }
+
+#token { fill: var(--accent); filter: drop-shadow(0 0 10px var(--accent)); transition: all 1s var(--e); }
+
+.note { border-left: 2px solid var(--info); padding-left: var(--s-3); transition: all var(--d-med); }
+.note h4 { color: var(--fg); font-size: var(--t-md); }
+.note .what { color: var(--fg-1); font-size: var(--t-sm); line-height: 1.45; margin: 4px 0; }
+.note .trans { color: var(--fg-3); font-size: var(--t-xs); line-height: 1.4; }
+.note .icon { margin-right: 6px; }
+
+.board-title { font: 500 10.5px var(--f-body); color: var(--fg-2);
+  letter-spacing: .16em; text-transform: uppercase; margin-bottom: 6px; }
+
+.blink { animation: blink 1.2s infinite; }
+@keyframes blink { 50% { opacity: 0.35; } }
+
+/* pointers */
+.pointer-row { position: relative; height: 32px; margin-top: 4px; pointer-events: none; }
+.pointer {
+  position: absolute; bottom: 0; left: 0;
+  transform: translateX(-50%);
+  color: var(--accent); font-size: 20px;
+  transition: left var(--d-slow) var(--e);
+  animation: bob 1.4s var(--e) infinite;
+}
+.pointer .tag {
+  display: block; margin-top: 4px;
+  font: 500 10px var(--f-mono); letter-spacing: .04em;
+  background: var(--accent); color: var(--bg);
+  padding: 3px 8px; border-radius: var(--r-full);
+  animation: none;
+}
+@keyframes bob { 0%,100% { transform: translateX(-50%) translateY(0); }
+                 50%     { transform: translateX(-50%) translateY(-4px); } }
+
+/* trace-step (operators_conditionals) */
+.trace-step {
+  padding: 10px 12px; margin: 4px 0;
+  background: var(--bg-1);
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--line);
+  border-radius: var(--r-sm);
+  font: 500 12px var(--f-mono); color: var(--fg-2);
+  transition: all var(--d-fast);
+}
+.trace-step.active { border-left-color: var(--accent); color: var(--fg); background: var(--bg-2); }
+.trace-step.done   { border-left-color: var(--success); color: var(--fg-1); }
+.trace-step .num {
+  display: inline-block; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--bg-3); text-align: center; line-height: 20px;
+  font: 500 10px var(--f-mono); margin-right: 8px; color: var(--fg-3);
+}
+.trace-step.active .num { background: var(--accent); color: #111; }
+.trace-step.done   .num { background: var(--success); color: #111; }
+
+.big-result {
+  margin-top: var(--s-3); padding: var(--s-4);
+  background: var(--bg-1); border: 1px solid var(--line);
+  border-radius: var(--r-md); text-align: center;
+}
+.big-result .label {
+  font: 500 10px var(--f-body); color: var(--fg-3);
+  text-transform: uppercase; letter-spacing: .16em;
+}
+.big-result .val {
+  font: 600 26px/1 var(--f-mono); color: var(--fg); margin-top: var(--s-2);
+  letter-spacing: -.02em;
+}
+.big-result.err .val { color: var(--danger); }
+.big-result.tru .val { color: var(--success); }
+.big-result.fls .val { color: var(--danger); }
+
+.truth { display: grid; grid-template-columns: repeat(3,1fr); gap: 3px; margin-top: 6px; }
+.truth .cell { padding: 8px; text-align: center;
+  background: var(--bg-1); border: 1px solid var(--line);
+  border-radius: var(--r-sm); color: var(--fg-2);
+  font: 500 12px var(--f-mono); }
+.truth .cell.T  { color: var(--success); }
+.truth .cell.F  { color: var(--danger); }
+.truth .cell.hl { background: var(--bg-2); border-color: var(--accent); color: var(--fg); }
+
+/* speed & misc controls */
+.speed { display: flex; gap: 6px; align-items: center; }
+
+/* ----------  UTILITIES  ---------- */
+.hide { display: none !important; }
+.center { text-align: center; }
+.mt-0 { margin-top: 0 !important; }
+
+::selection { background: var(--accent); color: var(--bg); }
+
+/* scrollbars */
+* { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: var(--r-full); }
+*::-webkit-scrollbar-thumb:hover { background: var(--fg-3); }
+
+</style>
+</head>
+<body>
+
+<div class="mat-bg" aria-hidden="true">
+  <div class="shape s1"></div><div class="shape circle s2"></div><div class="shape s3"></div><div class="shape circle s4"></div>
+  <div class="shape s5"></div><div class="shape circle s6"></div><div class="shape s7"></div><div class="shape circle s8"></div>
+  <div class="ripple r1"></div><div class="ripple r2"></div><div class="ripple r3"></div><div class="ripple r4"></div><div class="ripple r5"></div>
+</div>
+
+<button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+<div class="toast-wrap" id="toasts"></div>
+
+<h1>🧾 Python 1D Lists — DevOps Track</h1>
+<p class="subtitle">Interactive lesson · live visualisation · quizzes</p>
+
+<div class="tabs" id="tabs">
+  <button class="tab active" data-tab="create">Creating</button>
+  <button class="tab" data-tab="index">Indexing</button>
+  <button class="tab" data-tab="iter">Iteration</button>
+  <button class="tab" data-tab="methods">Methods</button>
+  <button class="tab" data-tab="plus">+ Operator</button>
+</div>
+
+<!-- ================= CREATING ================= -->
+<div class="panel active" id="panel-create">
+  <div class="card">
+    <h3>Creating Lists <span class="badge" id="crBadge">Literal</span></h3>
+    <p style="font-size:12px;color:#8fa3bd;margin-top:0">Pick a creation style — the code below updates live, and you can ▶ <b>play the build</b> to watch each element appear.</p>
+
+    <div class="modes" id="crModes">
+      <button class="mode-chip active" data-mode="lit">📝 Literal</button>
+      <button class="mode-chip" data-mode="rng">🔢 list(range)</button>
+      <button class="mode-chip" data-mode="str">🔤 list("abc")</button>
+      <button class="mode-chip" data-mode="rep">✳️ Repetition</button>
+    </div>
+
+    <pre class="code" id="crCode"></pre>
+
+    <div class="row" id="crLitRow">
+      <label class="inline">items (comma-separated)
+        <input id="crLitIn" type="text" value='"red", "green", "blue", "yellow"' style="width:260px">
+      </label>
+    </div>
+    <div class="row" id="crRngRow" style="display:none">
+      <label class="inline">range(<input id="crRngA" type="number" value="0" style="width:55px">,
+        <input id="crRngB" type="number" value="10" style="width:55px">,
+        <input id="crRngC" type="number" value="1" style="width:55px">)</label>
+    </div>
+    <div class="row" id="crStrRow" style="display:none">
+      <label class="inline">string <input id="crStrIn" type="text" value="hello" style="width:140px"></label>
+    </div>
+    <div class="row" id="crRepRow" style="display:none">
+      <label class="inline">value <input id="crRepV" type="text" value="⭐" style="width:60px"></label>
+      <label class="inline">× <input id="crRepN" type="number" value="7" min="0" max="25" style="width:60px"></label>
+    </div>
+
+    <div class="row">
+      <button class="btn go" id="crPlay">▶ Play build</button>
+      <button class="btn alt" id="crInstant">⚡ Instant</button>
+      <label class="inline">speed <input id="crSpeed" type="range" min="60" max="800" value="250"></label>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Visualisation</h3>
+    <p style="font-size:12px;color:#8fa3bd;margin-top:0">Each element pops in as the list grows.</p>
+    <div class="listviz margined" id="crViz"></div>
+    <div class="big-vars">
+      <div class="big-var"><div class="lbl">elements built</div><div class="v" id="crCount">0</div></div>
+      <div class="big-var"><div class="lbl">len(list)</div><div class="v" id="crLen">0</div></div>
+    </div>
+    <div class="output" id="crOut"></div>
+  </div>
+</div>
+
+<!-- ================= INDEXING ================= -->
+<div class="panel" id="panel-index">
+  <div class="card">
+    <h3>Indexing in a List</h3>
+    <pre class="code" id="idxCode"></pre>
+    <div class="warn">⚠️ <b>fruits[100]</b> raises <b>IndexError</b> — index must be within bounds.</div>
+
+    <div class="modes">
+      <button class="mode-chip active" data-imode="free">🎮 Free play</button>
+      <button class="mode-chip" data-imode="chal">🎯 Challenge</button>
+    </div>
+
+    <div id="idxFreeRow">
+      <div class="row">
+        <label class="inline">fruits[<input id="idxI" type="number" value="3" style="width:70px">]</label>
+        <button class="btn go" id="btnIdx">Access</button>
+        <button class="btn alt" id="btnIdxRand">🎲 Random</button>
+      </div>
+    </div>
+    <div id="idxChalRow" style="display:none">
+      <p style="font-size:12.5px;color:#ffd166;margin:6px 0">Challenge: give the index (positive OR negative) for the target fruit.</p>
+      <div class="row">
+        <div id="idxTarget" style="font-size:28px">🍒</div>
+        <label class="inline">answer <input id="idxAns" type="number" style="width:70px"></label>
+        <button class="btn go" id="btnIdxCheck">Check</button>
+        <button class="btn alt" id="btnIdxNext">Next →</button>
+      </div>
+      <div class="output" id="idxChalOut"></div>
+    </div>
+
+    <div class="output" id="idxOut"></div>
+  </div>
+  <div class="card">
+    <h3>Visualisation</h3>
+    <p style="font-size:12px;color:#8fa3bd;margin-top:0">Click any box · pointer flies to your pick · indices shown above/below.</p>
+    <div class="listviz margined" id="idxViz"></div>
+    <div class="pointer-row" id="idxPointerRow"><div class="pointer" id="idxPointer" style="display:none">▲<span class="tag" id="idxTag">i=0</span></div></div>
+    <div id="idxExplain" style="font-size:12.5px;color:#a6b8cf;line-height:1.55;margin-top:10px"></div>
+  </div>
+</div>
+
+<!-- ================= ITERATION ================= -->
+<div class="panel" id="panel-iter">
+  <div class="card">
+    <h3>Iteration <span class="badge" id="itBadge">step 0 / 0</span></h3>
+
+    <div class="modes" id="itModes">
+      <button class="mode-chip active" data-itmode="val">for name in students</button>
+      <button class="mode-chip" data-itmode="idx">range(len(…))</button>
+      <button class="mode-chip" data-itmode="enum">enumerate(…)</button>
+    </div>
+
+    <pre class="code" id="itCode"></pre>
+
+    <div class="row">
+      <button class="btn go" id="btnItNext">▶ Step</button>
+      <button class="btn alt" id="btnItAuto">⏩ Auto play</button>
+      <button class="btn warn" id="btnItReset">↺ Reset</button>
+      <label class="inline">speed <input id="itSpeed" type="range" min="150" max="1400" value="700"></label>
+    </div>
+
+    <div class="big-vars">
+      <div class="big-var"><div class="lbl">i</div><div class="v" id="itI">—</div></div>
+      <div class="big-var"><div class="lbl">name</div><div class="v" id="itName">—</div></div>
+    </div>
+
+    <h4 style="margin-top:10px">Membership check</h4>
+    <div class="row">
+      <label class="inline">check <input id="itIn" type="text" value="Kusum" style="width:120px"></label>
+      <button class="btn alt" id="btnItIn">value in students ?</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Watch it iterate</h3>
+    <p style="font-size:12px;color:#8fa3bd;margin-top:0">Current element is highlighted with a bouncing pointer.</p>
+    <div class="listviz margined" id="iterViz"></div>
+    <div class="pointer-row"><div class="pointer" id="iterPointer" style="display:none">▲<span class="tag" id="iterTag">i=0</span></div></div>
+    <div class="output" id="iterOut"></div>
+  </div>
+</div>
+
+<!-- ================= METHODS ================= -->
+<div class="panel" id="panel-methods">
+  <div class="card">
+    <h3>Live Code <span class="badge" id="mLenBadge">len = 5</span></h3>
+    <p style="font-size:12px;color:#8fa3bd;margin-top:0">Every click below updates this code AND animates the list. Undo if you regret something!</p>
+    <pre class="code" id="mCode"></pre>
+    <h4>Current list</h4>
+    <div class="listviz margined" id="mViz"></div>
+    <div class="big-vars">
+      <div class="big-var"><div class="lbl">len(li)</div><div class="v" id="mLenBig">5</div></div>
+      <div class="big-var"><div class="lbl">last action</div><div class="v" id="mLast" style="font-size:13px">—</div></div>
+    </div>
+    <div class="output" id="mOut"></div>
+  </div>
+  <div class="card">
+    <h3>Methods Playground</h3>
+    <div class="modes">
+      <button class="mode-chip active" data-preset="nums">🔢 Numbers</button>
+      <button class="mode-chip" data-preset="fruits">🍎 Fruits</button>
+      <button class="mode-chip" data-preset="colors">🎨 Colors</button>
+      <button class="mode-chip" data-preset="empty">📭 Empty</button>
+    </div>
+    <div class="row">
+      <label class="inline">value <input id="mVal" type="text" value="60" style="width:100px"></label>
+      <label class="inline">index <input id="mIdx" type="number" value="2" style="width:70px"></label>
+      <button class="btn alt" id="btnMUndo">↶ Undo</button>
+      <button class="btn" data-m="reset">↺ Reset</button>
+    </div>
+    <h4 style="margin-top:14px">🟢 Add items</h4>
+    <div class="row">
+      <button class="btn go" data-m="append">append(value)</button>
+      <button class="btn go" data-m="extend">extend([value])</button>
+      <button class="btn go" data-m="insert">insert(index, value)</button>
+    </div>
+    <h4>🔵 Remove items</h4>
+    <div class="row">
+      <button class="btn alt" data-m="pop">pop()</button>
+      <button class="btn alt" data-m="popIdx">pop(index)</button>
+      <button class="btn alt" data-m="remove">remove(value)</button>
+    </div>
+    <h4>🟡 Query &amp; reorder</h4>
+    <div class="row">
+      <button class="btn warn" data-m="count">count(value)</button>
+      <button class="btn warn" data-m="index">index(value)</button>
+      <button class="btn warn" data-m="len">len(li)</button>
+      <button class="btn warn" data-m="sort">sort()</button>
+      <button class="btn warn" data-m="sortDesc">sort(reverse=True)</button>
+      <button class="btn warn" data-m="reverse">reverse()</button>
+    </div>
+    <h4>🔴 Wipe out</h4>
+    <div class="row">
+      <button class="btn" data-m="clear">clear()</button>
+      <button class="btn" data-m="copy">copy()</button>
+    </div>
+    <div class="warn" style="margin-top:12px"><b>Gotcha</b>: <code>a = b</code> doesn't copy — both names point to the <b>same</b> list. Use <code>b = a.copy()</code> or <code>b = a[:]</code>.</div>
+  </div>
+</div>
+
+<!-- ================= + OPERATOR ================= -->
+<div class="panel" id="panel-plus">
+  <div class="card">
+    <h3>Live Code</h3>
+    <p style="font-size:12px;color:#8fa3bd;margin-top:0">Edit <code>a</code> and <code>b</code> on the right. Press <b>▶ Merge</b> to watch items fly into <code>c</code>.</p>
+    <pre class="code" id="plusCode"></pre>
+    <div class="tip"><b>+</b> creates a <b>new</b> list <code>c</code>. Both <code>a</code> and <code>b</code> stay exactly the same — nothing is mutated.</div>
+    <div class="big-vars">
+      <div class="big-var"><div class="lbl">len(a)</div><div class="v" id="plusLenA">0</div></div>
+      <div class="big-var"><div class="lbl">len(b)</div><div class="v" id="plusLenB">0</div></div>
+      <div class="big-var"><div class="lbl">len(c)</div><div class="v" id="plusLenC">0</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Concatenation Visualiser</h3>
+    <div class="row">
+      <label class="inline">a = [ <input id="plusA" type="text" value="1, 2, 3" style="width:170px"> ]</label>
+    </div>
+    <div class="row">
+      <label class="inline">b = [ <input id="plusB" type="text" value="4, 5, 6" style="width:170px"> ]</label>
+    </div>
+    <div class="row">
+      <button class="btn go" id="btnPlusAnim">▶ Merge animation</button>
+      <button class="btn alt" id="btnPlus">⚡ Instant</button>
+      <label class="inline">speed <input id="plusSpeed" type="range" min="80" max="700" value="250"></label>
+    </div>
+    <div class="row">
+      <button class="btn warn" id="btnPlusFruits">🍎 Fruits</button>
+      <button class="btn warn" id="btnPlusMixed">🔀 Mixed types</button>
+      <button class="btn warn" id="btnPlusEmoji">😀 Emoji</button>
+    </div>
+
+    <h4 style="margin-top:14px">🔵 a</h4>
+    <div class="listviz margined" id="plusAViz"></div>
+    <h4>🟣 b</h4>
+    <div class="listviz margined" id="plusBViz"></div>
+    <h4>🟢 c = a + b</h4>
+    <div class="listviz margined" id="plusCViz"></div>
+    <div class="output" id="plusOut"></div>
+  </div>
+</div>
+
+<script>
+/* ============ THEME ============ */
+(function(){
+  const KEY='lists1d_theme';
+  const apply=t=>{document.body.classList.toggle('light',t==='light');
+    document.getElementById('themeToggle').textContent=t==='light'?'☀️':'🌙';};
+  apply(localStorage.getItem(KEY)||'dark');
+  document.getElementById('themeToggle').onclick=()=>{
+    const n=document.body.classList.contains('light')?'dark':'light';
+    localStorage.setItem(KEY,n); apply(n);
+  };
+})();
+
+/* ============ TABS ============ */
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick = ()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('panel-'+t.dataset.tab).classList.add('active');
+  };
+});
+
+/* ============ helpers ============ */
+function repr(v){
+  if(typeof v==='string') return "'"+v+"'";
+  if(Array.isArray(v)) return '['+v.map(repr).join(', ')+']';
+  if(typeof v==='boolean') return v?'True':'False';
+  return String(v);
+}
+function reprList(arr){ return '['+arr.map(repr).join(', ')+']'; }
+function renderList(container, arr, opts={}){
+  const el = typeof container==='string'?document.getElementById(container):container;
+  el.innerHTML = '';
+  const n = arr.length;
+  arr.forEach((v,i)=>{
+    const div = document.createElement('div');
+    div.className = 'litem';
+    if(opts.hl && opts.hl.includes(i)) div.classList.add('hl');
+    if(opts.sliced && opts.sliced.includes(i)) div.classList.add('sliced');
+    div.innerHTML = `<span class="neg">${i-n}</span>${escapeHtml(repr(v))}<span class="ix">${i}</span>`;
+    if(opts.onClick) div.onclick = ()=>opts.onClick(i, v);
+    el.appendChild(div);
+  });
+  if(arr.length===0){
+    el.innerHTML = '<div style="color:#64748b;font-size:12px;padding:10px">(empty list)</div>';
+  }
+}
+function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function log(id, text, cls){
+  const o = document.getElementById(id);
+  const sp = document.createElement('span'); if(cls) sp.className = cls;
+  sp.textContent = text+'\n'; o.appendChild(sp); o.scrollTop = o.scrollHeight;
+}
+function clearLog(id){ document.getElementById(id).innerHTML=''; }
+
+/* ============ shared utilities ============ */
+function reprPy(v){
+  if(typeof v==='string') return `"${v}"`;
+  if(Array.isArray(v)) return '['+v.map(reprPy).join(', ')+']';
+  if(typeof v==='boolean') return v?'True':'False';
+  return String(v);
+}
+function pyListLiteral(arr){ return '['+arr.map(reprPy).join(', ')+']'; }
+
+function toast(msg, kind='ok'){
+  const wrap = document.getElementById('toasts');
+  const t = document.createElement('div'); t.className = 'toast ' + (kind==='ok'?'':kind);
+  t.textContent = msg; wrap.appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateX(40px)'; t.style.transition='all .3s'; }, 1800);
+  setTimeout(()=>{ t.remove(); }, 2200);
+}
+
+function renderAnimated(containerId, arr, opts={}){
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  const n = arr.length;
+  arr.forEach((v,i)=>{
+    const div = document.createElement('div');
+    div.className = 'litem';
+    if(opts.hl && opts.hl.includes(i)) div.classList.add('hl');
+    if(opts.sliced && opts.sliced.includes(i)) div.classList.add('sliced');
+    if(opts.anim) div.classList.add(opts.anim);
+    div.innerHTML = `<span class="neg">${i-n}</span>${escapeHtml(repr(v))}<span class="ix">${i}</span>`;
+    if(opts.onClick) div.onclick = ()=>opts.onClick(i,v);
+    el.appendChild(div);
+  });
+  if(n===0) el.innerHTML = '<div style="color:#64748b;font-size:12px;padding:10px">(empty list)</div>';
+}
+
+/* ============ CREATING ============ */
+let crMode = 'lit', crPlayTimer = null;
+function crBuildItems(){
+  const mode = crMode;
+  if(mode==='lit'){
+    const raw = document.getElementById('crLitIn').value;
+    return raw.split(',').map(s=>{
+      const t = s.trim();
+      if((t.startsWith('"')&&t.endsWith('"')) || (t.startsWith("'")&&t.endsWith("'"))) return t.slice(1,-1);
+      if(t==='') return null;
+      const n = Number(t); return isNaN(n)?t:n;
+    }).filter(x=>x!==null);
+  }
+  if(mode==='rng'){
+    const a=+document.getElementById('crRngA').value||0;
+    const b=+document.getElementById('crRngB').value||0;
+    const c=+document.getElementById('crRngC').value||1;
+    const arr=[], MAX=40;
+    if(c===0) return [];
+    if(c>0) for(let i=a;i<b && arr.length<MAX;i+=c) arr.push(i);
+    else    for(let i=a;i>b && arr.length<MAX;i+=c) arr.push(i);
+    return arr;
+  }
+  if(mode==='str'){
+    return [...document.getElementById('crStrIn').value].slice(0,40);
+  }
+  if(mode==='rep'){
+    const v = document.getElementById('crRepV').value;
+    const val = (v===''||isNaN(+v))?v:+v;
+    const n = Math.max(0, Math.min(25, +document.getElementById('crRepN').value||0));
+    return Array(n).fill(val);
+  }
+  return [];
+}
+function crCodeFor(items){
+  const code = document.getElementById('crCode');
+  let html = '';
+  if(crMode==='lit')      html = `<span class="cm"># literal</span>\nli = ${escapeHtml(pyListLiteral(items))}`;
+  else if(crMode==='rng') {
+    const a=+document.getElementById('crRngA').value||0;
+    const b=+document.getElementById('crRngB').value||0;
+    const c=+document.getElementById('crRngC').value||1;
+    const args = c===1?`${a}, ${b}`:`${a}, ${b}, ${c}`;
+    html = `<span class="cm"># from range()</span>\nli = <span class="fn">list</span>(<span class="fn">range</span>(${args}))   <span class="cm"># → ${escapeHtml(pyListLiteral(items))}</span>`;
+  }
+  else if(crMode==='str') {
+    const s = document.getElementById('crStrIn').value;
+    html = `<span class="cm"># from a string</span>\nli = <span class="fn">list</span>(<span class="str">"${escapeHtml(s)}"</span>)   <span class="cm"># → ${escapeHtml(pyListLiteral(items))}</span>`;
+  }
+  else if(crMode==='rep') {
+    const v = document.getElementById('crRepV').value;
+    const n = +document.getElementById('crRepN').value||0;
+    html = `<span class="cm"># repetition</span>\nli = [${escapeHtml(reprPy((v===''||isNaN(+v))?v:+v))}] * <span class="num">${n}</span>   <span class="cm"># → ${escapeHtml(pyListLiteral(items))}</span>`;
+  }
+  code.innerHTML = html;
+}
+function crUpdateStats(n, total){
+  document.getElementById('crCount').textContent = n;
+  document.getElementById('crLen').textContent = n;
+  const cEl = document.getElementById('crLen'); cEl.classList.remove('bump'); void cEl.offsetWidth; cEl.classList.add('bump');
+}
+function crInstantRender(){
+  if(crPlayTimer){ clearInterval(crPlayTimer); crPlayTimer=null; }
+  const items = crBuildItems();
+  crCodeFor(items);
+  renderAnimated('crViz', items, {anim:'appearing'});
+  crUpdateStats(items.length, items.length);
+  clearLog('crOut'); log('crOut', `built ${items.length} item(s) → ${reprList(items)}`);
+}
+function crPlayBuild(){
+  if(crPlayTimer){ clearInterval(crPlayTimer); crPlayTimer=null; document.getElementById('crPlay').textContent='▶ Play build'; return; }
+  const items = crBuildItems();
+  crCodeFor(items);
+  renderAnimated('crViz', [], {});
+  crUpdateStats(0, items.length);
+  clearLog('crOut');
+  const speed = +document.getElementById('crSpeed').value;
+  let i = 0;
+  document.getElementById('crPlay').textContent = '⏸ Pause';
+  crPlayTimer = setInterval(()=>{
+    if(i>=items.length){ clearInterval(crPlayTimer); crPlayTimer=null; document.getElementById('crPlay').textContent='▶ Play build'; toast('build complete ✓'); return; }
+    const sub = items.slice(0, i+1);
+    renderAnimated('crViz', sub, {hl:[i], anim:'appearing'});
+    crUpdateStats(sub.length, items.length);
+    log('crOut', `+ ${repr(items[i])}   (index ${i})`);
+    i++;
+  }, speed);
+}
+document.querySelectorAll('#crModes .mode-chip').forEach(chip=>{
+  chip.onclick = ()=>{
+    document.querySelectorAll('#crModes .mode-chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    crMode = chip.dataset.mode;
+    ['Lit','Rng','Str','Rep'].forEach(n=>{
+      document.getElementById('cr'+n+'Row').style.display = (crMode===n.toLowerCase()?'flex':'none');
+    });
+    crInstantRender();
+  };
+});
+['crLitIn','crRngA','crRngB','crRngC','crStrIn','crRepV','crRepN'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', crInstantRender);
+});
+document.getElementById('crPlay').onclick = crPlayBuild;
+document.getElementById('crInstant').onclick = crInstantRender;
+crInstantRender();
+
+/* ============ INDEXING ============ */
+const fruits = ["🍎apple","🍌banana","🍒cherry","🍇grapes","🍊orange","🍍pineapple","🥝kiwi","🍓strawberry","🍑peach","🍉watermelon"];
+let idxMode = 'free', idxTarget = 2;
+
+function renderIdxCode(i){
+  const safeI = i===null||i===undefined||isNaN(i) ? 3 : i;
+  const code = document.getElementById('idxCode');
+  code.innerHTML =
+    `<span class="cm"># a list of 10 fruits</span>\n`+
+    `fruits = [${fruits.map(f=>`<span class="str">"${f}"</span>`).join(', ')}]\n\n`+
+    `<span class="fn">print</span>(fruits[<span class="num">${safeI}</span>])`;
+}
+function movePointerToIndex(real){
+  const row = document.getElementById('idxPointerRow');
+  const viz = document.getElementById('idxViz');
+  const items = viz.querySelectorAll('.litem');
+  const ptr = document.getElementById('idxPointer');
+  if(real==null || real<0 || real>=items.length){ ptr.style.display='none'; return; }
+  const box = items[real].getBoundingClientRect();
+  const rowBox = row.getBoundingClientRect();
+  const leftPx = box.left + box.width/2 - rowBox.left;
+  ptr.style.display='block';
+  ptr.style.left = leftPx + 'px';
+  document.getElementById('idxTag').textContent = `i=${real}  (neg=${real - items.length})`;
+}
+function drawIdx(hl){
+  renderAnimated('idxViz', fruits, {hl:hl!=null?[hl]:[], onClick:(i)=>{
+    if(idxMode==='free'){ document.getElementById('idxI').value=i; doIdx(); }
+    else { document.getElementById('idxAns').value=i; }
+  }});
+  setTimeout(()=>movePointerToIndex(hl), 30);
+}
+function doIdx(){
+  const i = +document.getElementById('idxI').value;
+  renderIdxCode(i);
+  clearLog('idxOut');
+  const n = fruits.length;
+  let real = i<0 ? n+i : i;
+  const explain = document.getElementById('idxExplain');
+  if(real<0 || real>=n){
+    log('idxOut',`fruits[${i}] → IndexError: list index out of range`,'err');
+    explain.innerHTML = `❌ <b>Out of range</b>. Valid indices are <b>0 to ${n-1}</b> (or <b>-1 to -${n}</b>).`;
+    toast('IndexError','err');
+    drawIdx(null); return;
+  }
+  log('idxOut', `fruits[${i}] = ${repr(fruits[real])}`);
+  const pos = real, neg = real - n;
+  explain.innerHTML = `🎯 index <b>${i}</b> · position <b>${pos}</b> from left (or <b>${neg}</b> from right) → <b>${escapeHtml(fruits[real])}</b>`;
+  drawIdx(real);
+}
+document.getElementById('btnIdx').onclick = doIdx;
+document.getElementById('btnIdxRand').onclick = ()=>{
+  const n = fruits.length;
+  const r = Math.floor(Math.random() * (n*2)) - n;
+  document.getElementById('idxI').value = r;
+  doIdx();
+};
+document.querySelectorAll('#panel-index .mode-chip').forEach(chip=>{
+  chip.onclick = ()=>{
+    document.querySelectorAll('#panel-index .mode-chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    idxMode = chip.dataset.imode;
+    document.getElementById('idxFreeRow').style.display = idxMode==='free'?'block':'none';
+    document.getElementById('idxChalRow').style.display = idxMode==='chal'?'block':'none';
+    if(idxMode==='chal') newChallenge();
+    drawIdx(null);
+  };
+});
+function newChallenge(){
+  idxTarget = Math.floor(Math.random()*fruits.length);
+  const fruit = fruits[idxTarget];
+  // show just the emoji + name
+  document.getElementById('idxTarget').innerHTML = `Target: <b style="color:#ffd166">${escapeHtml(fruit)}</b>`;
+  document.getElementById('idxAns').value = '';
+  clearLog('idxChalOut');
+}
+document.getElementById('btnIdxNext').onclick = newChallenge;
+document.getElementById('btnIdxCheck').onclick = ()=>{
+  const ans = parseInt(document.getElementById('idxAns').value,10);
+  if(isNaN(ans)){ toast('enter a number','err'); return; }
+  const n = fruits.length;
+  const real = ans<0 ? n+ans : ans;
+  clearLog('idxChalOut');
+  if(real===idxTarget){
+    log('idxChalOut', `✓ correct! fruits[${ans}] = ${repr(fruits[idxTarget])}`);
+    toast('correct ✓');
+    drawIdx(real);
+    setTimeout(newChallenge, 1200);
+  } else if(real>=0 && real<n) {
+    log('idxChalOut', `✗ fruits[${ans}] = ${repr(fruits[real])}, not the target`,'err');
+    toast('try again','err');
+  } else {
+    log('idxChalOut', `✗ out of range`,'err');
+    toast('out of range','err');
+  }
+};
+renderIdxCode(3);
+drawIdx(null);
+window.addEventListener('resize', ()=>{ const hl = document.querySelector('#idxViz .litem.hl'); if(hl){ const idx = [...hl.parentElement.children].indexOf(hl); movePointerToIndex(idx); } });
+
+/* ============ ITERATION ============ */
+const itArr = ["Kusum","Shubham","Pooja","Ruben","Karen"];
+let itMode = 'val', itAutoTimer = null, itStep = 0, itStarted = false;
+
+function renderItCode(activeLine){
+  const code = document.getElementById('itCode');
+  const arrPy = pyListLiteral(itArr);
+  const lines = [];
+  lines.push(`students = ${escapeHtml(arrPy)}`);
+  lines.push(``);
+  if(itMode==='val'){
+    lines.push(`<span class="kw">for</span> name <span class="kw">in</span> students:`);
+    lines.push(`    <span class="fn">print</span>(name)`);
+  } else if(itMode==='idx'){
+    lines.push(`<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(students)):`);
+    lines.push(`    <span class="fn">print</span>(i, students[i])`);
+  } else {
+    lines.push(`<span class="kw">for</span> i, name <span class="kw">in</span> <span class="fn">enumerate</span>(students):`);
+    lines.push(`    <span class="fn">print</span>(i, name)`);
+  }
+  code.innerHTML = lines.map((l,idx)=>`<span class="ln${activeLine===idx?' active':''}">${l}</span>`).join('\n');
+}
+function movePointerIter(i){
+  const row = document.querySelector('#panel-iter .pointer-row');
+  const viz = document.getElementById('iterViz');
+  const items = viz.querySelectorAll('.litem');
+  const ptr = document.getElementById('iterPointer');
+  if(i==null || i<0 || i>=items.length){ ptr.style.display='none'; return; }
+  const box = items[i].getBoundingClientRect();
+  const rowBox = row.getBoundingClientRect();
+  ptr.style.display='block';
+  ptr.style.left = (box.left + box.width/2 - rowBox.left) + 'px';
+  document.getElementById('iterTag').textContent = itMode==='val'?itArr[i]:`i=${i}`;
+}
+function drawIter(hl){
+  renderAnimated('iterViz', itArr, {hl:hl!=null?[hl]:[]});
+  setTimeout(()=>movePointerIter(hl), 30);
+}
+function resetIter(){
+  if(itAutoTimer){ clearInterval(itAutoTimer); itAutoTimer=null; }
+  itStep = 0; itStarted = false;
+  document.getElementById('btnItAuto').textContent = '⏩ Auto play';
+  document.getElementById('itI').textContent = '—';
+  document.getElementById('itName').textContent = '—';
+  document.getElementById('itBadge').textContent = `step 0 / ${itArr.length}`;
+  clearLog('iterOut');
+  drawIter(null);
+  renderItCode(itStarted?3:null);
+}
+function itDoStep(){
+  if(itStep>=itArr.length){
+    renderItCode(null);
+    drawIter(null);
+    if(itAutoTimer){ clearInterval(itAutoTimer); itAutoTimer=null; document.getElementById('btnItAuto').textContent='⏩ Auto play'; }
+    toast('loop finished');
+    return false;
+  }
+  itStarted = true;
+  const i = itStep;
+  const name = itArr[i];
+  drawIter(i);
+  renderItCode(3);  // body line
+  // bump variable cards
+  const iEl = document.getElementById('itI'), nEl = document.getElementById('itName');
+  if(itMode==='val'){ iEl.textContent='—'; nEl.textContent = name; }
+  else { iEl.textContent = i; nEl.textContent = name; }
+  [iEl,nEl].forEach(e=>{ e.classList.remove('bump'); void e.offsetWidth; e.classList.add('bump'); });
+  // output
+  if(itMode==='val') log('iterOut', name);
+  else log('iterOut', `${i} ${name}`);
+  document.getElementById('itBadge').textContent = `step ${i+1} / ${itArr.length}`;
+  itStep++;
+  return true;
+}
+document.getElementById('btnItNext').onclick = ()=>{
+  if(itAutoTimer){ clearInterval(itAutoTimer); itAutoTimer=null; document.getElementById('btnItAuto').textContent='⏩ Auto play'; }
+  itDoStep();
+};
+document.getElementById('btnItAuto').onclick = ()=>{
+  if(itAutoTimer){ clearInterval(itAutoTimer); itAutoTimer=null; document.getElementById('btnItAuto').textContent='⏩ Auto play'; return; }
+  const speed = +document.getElementById('itSpeed').value;
+  document.getElementById('btnItAuto').textContent = '⏸ Pause';
+  itAutoTimer = setInterval(()=>{
+    if(!itDoStep()){ /* finished */ }
+  }, speed);
+};
+document.getElementById('btnItReset').onclick = resetIter;
+document.getElementById('itSpeed').addEventListener('input', ()=>{
+  if(itAutoTimer){ clearInterval(itAutoTimer); itAutoTimer=setInterval(()=>{ if(!itDoStep()){} }, +document.getElementById('itSpeed').value); }
+});
+document.querySelectorAll('#itModes .mode-chip').forEach(chip=>{
+  chip.onclick = ()=>{
+    document.querySelectorAll('#itModes .mode-chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    itMode = chip.dataset.itmode;
+    resetIter();
+  };
+});
+document.getElementById('btnItIn').onclick = ()=>{
+  const v = document.getElementById('itIn').value;
+  const inList = itArr.includes(v);
+  log('iterOut', `"${v}" in students  →  ${inList?'True':'False'}`);
+  toast(inList?`"${v}" found`:`"${v}" not found`, inList?'ok':'err');
+};
+resetIter();
+window.addEventListener('resize', ()=>{
+  const hl = document.querySelector('#iterViz .litem.hl');
+  if(hl){ const idx = [...hl.parentElement.children].indexOf(hl); movePointerIter(idx); }
+});
+
+/* ============ METHODS ============ */
+const PRESETS = {
+  nums:   [10, 20, 30, 40, 50],
+  fruits: ["apple","banana","cherry","grape"],
+  colors: ["red","green","blue"],
+  empty:  [],
+};
+let mPreset = 'nums';
+let mArr = [...PRESETS[mPreset]];
+let mHistory = [];     // for code display
+let mUndoStack = [];   // snapshots for undo
+
+function snapshot(){ mUndoStack.push({arr:[...mArr], history:[...mHistory]}); if(mUndoStack.length>30) mUndoStack.shift(); }
+
+function renderMCode(){
+  const code = document.getElementById('mCode');
+  let html = `<span class="cm"># preset: ${mPreset}</span>\n`+
+             `li = ${escapeHtml(pyListLiteral(PRESETS[mPreset]))}\n`;
+  if(mHistory.length){
+    html += `\n<span class="cm"># your actions</span>\n` + mHistory.join('\n') + '\n';
+  }
+  html += `\n<span class="fn">print</span>(li)   <span class="cm"># ${escapeHtml(pyListLiteral(mArr))}</span>`;
+  code.innerHTML = html;
+  document.getElementById('mLenBadge').textContent = `len = ${mArr.length}`;
+  const lenEl = document.getElementById('mLenBig');
+  lenEl.textContent = mArr.length;
+  lenEl.classList.remove('bump'); void lenEl.offsetWidth; lenEl.classList.add('bump');
+}
+
+function drawM(hl, anim){
+  const opts = {hl:hl!=null?(Array.isArray(hl)?hl:[hl]):[], anim};
+  renderAnimated('mViz', mArr, opts);
+  renderMCode();
+}
+
+function animateRemove(targetIndex, then){
+  const viz = document.getElementById('mViz');
+  const items = viz.querySelectorAll('.litem');
+  if(items[targetIndex]){
+    items[targetIndex].classList.add('removing');
+    setTimeout(then, 400);
+  } else then();
+}
+
+function parseMval(){
+  const raw = document.getElementById('mVal').value.trim();
+  if(raw==='') return '';
+  if(raw.startsWith('[') && raw.endsWith(']')){
+    try { return JSON.parse(raw.replace(/'/g,'"')); } catch(_){}
+  }
+  const n=Number(raw);
+  return (isNaN(n) || raw==='') ? raw : n;
+}
+function setLast(label){ const e=document.getElementById('mLast'); e.textContent=label; e.classList.remove('bump'); void e.offsetWidth; e.classList.add('bump'); }
+
+document.querySelectorAll('#panel-methods .mode-chip[data-preset]').forEach(chip=>{
+  chip.onclick = ()=>{
+    document.querySelectorAll('#panel-methods .mode-chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    mPreset = chip.dataset.preset;
+    mArr = [...PRESETS[mPreset]];
+    mHistory = []; mUndoStack = [];
+    clearLog('mOut');
+    drawM(null, 'appearing');
+    setLast('reset');
+    toast(`preset → ${mPreset}`, 'info');
+  };
+});
+
+document.getElementById('btnMUndo').onclick = ()=>{
+  if(mUndoStack.length===0){ toast('nothing to undo','err'); return; }
+  const s = mUndoStack.pop();
+  mArr = s.arr; mHistory = s.history;
+  drawM(null);
+  setLast('undo');
+  toast('undone');
+};
+
+document.querySelectorAll('#panel-methods button[data-m]').forEach(b=>{
+  b.onclick = ()=>{
+    const m = b.dataset.m;
+    const v = parseMval();
+    const i = +document.getElementById('mIdx').value;
+    clearLog('mOut');
+    let line = null, hl = null, anim = null;
+    try{
+      switch(m){
+        case 'append':
+          snapshot();
+          mArr.push(v); hl = mArr.length-1; anim = 'appearing';
+          line = `li.<span class="fn">append</span>(${escapeHtml(reprPy(v))})   <span class="cm"># → ${escapeHtml(pyListLiteral(mArr))}</span>`;
+          log('mOut', `append added ${reprPy(v)} at the end (index ${hl}).`);
+          setLast(`append(${reprPy(v)})`); toast(`+ ${reprPy(v)}`);
+          break;
+        case 'extend': {
+          const iter = Array.isArray(v) ? v : (typeof v==='string' ? [...v] : null);
+          if(iter===null){ log('mOut',`li.extend(${reprPy(v)}) → TypeError: ${typeof v} is not iterable`,'err'); toast('extend needs iterable','err'); return; }
+          snapshot();
+          const before = mArr.length; mArr.push(...iter);
+          hl = Array.from({length:iter.length},(_,k)=>before+k); anim='appearing';
+          line = `li.<span class="fn">extend</span>(${escapeHtml(reprPy(iter))})   <span class="cm"># → ${escapeHtml(pyListLiteral(mArr))}</span>`;
+          log('mOut', `extend added each of ${iter.length} item(s).`);
+          setLast(`extend(${iter.length} items)`);
+          break;
+        }
+        case 'insert':
+          snapshot();
+          mArr.splice(i,0,v); hl = i; anim='inserting';
+          line = `li.<span class="fn">insert</span>(${i}, ${escapeHtml(reprPy(v))})   <span class="cm"># → ${escapeHtml(pyListLiteral(mArr))}</span>`;
+          log('mOut', `inserted ${reprPy(v)} BEFORE index ${i}.`);
+          setLast(`insert(${i}, ${reprPy(v)})`);
+          break;
+        case 'pop':
+          if(mArr.length===0){ log('mOut','li.pop() → IndexError: pop from empty list','err'); toast('empty list','err'); return; }
+          snapshot();
+          animateRemove(mArr.length-1, ()=>{
+            const x = mArr.pop();
+            mHistory.push(`x = li.<span class="fn">pop</span>()   <span class="cm"># x=${escapeHtml(reprPy(x))}, li=${escapeHtml(pyListLiteral(mArr))}</span>`);
+            log('mOut', `pop() removed & returned ${reprPy(x)}.`);
+            setLast(`pop() = ${reprPy(x)}`); toast(`popped ${reprPy(x)}`);
+            drawM(null);
+          });
+          return;
+        case 'popIdx':
+          if(i<0 || i>=mArr.length){ log('mOut',`li.pop(${i}) → IndexError`,'err'); toast('index out of range','err'); return; }
+          snapshot();
+          animateRemove(i, ()=>{
+            const x = mArr.splice(i,1)[0];
+            mHistory.push(`x = li.<span class="fn">pop</span>(${i})   <span class="cm"># x=${escapeHtml(reprPy(x))}, li=${escapeHtml(pyListLiteral(mArr))}</span>`);
+            log('mOut', `pop(${i}) removed & returned ${reprPy(x)}.`);
+            setLast(`pop(${i}) = ${reprPy(x)}`); toast(`popped ${reprPy(x)}`);
+            drawM(null);
+          });
+          return;
+        case 'remove': {
+          const ix = mArr.findIndex(x=>x===v);
+          if(ix<0){ log('mOut',`li.remove(${reprPy(v)}) → ValueError: not in list`,'err'); toast('value not in list','err'); return; }
+          snapshot();
+          animateRemove(ix, ()=>{
+            mArr.splice(ix,1);
+            mHistory.push(`li.<span class="fn">remove</span>(${escapeHtml(reprPy(v))})   <span class="cm"># → ${escapeHtml(pyListLiteral(mArr))}</span>`);
+            log('mOut', `remove() deleted the first ${reprPy(v)} (was at index ${ix}).`);
+            setLast(`remove(${reprPy(v)})`); toast(`removed ${reprPy(v)}`);
+            drawM(null);
+          });
+          return;
+        }
+        case 'count': {
+          const c = mArr.filter(x=>x===v).length;
+          line = `<span class="fn">print</span>(li.<span class="fn">count</span>(${escapeHtml(reprPy(v))}))   <span class="cm"># → ${c}</span>`;
+          log('mOut', `${reprPy(v)} appears ${c} time(s).`);
+          setLast(`count(${reprPy(v)}) = ${c}`); toast(`count = ${c}`, 'info');
+          break;
+        }
+        case 'index': {
+          const ix = mArr.findIndex(x=>x===v);
+          if(ix<0){ log('mOut',`li.index(${reprPy(v)}) → ValueError: not in list`,'err'); toast('not found','err'); return; }
+          line = `<span class="fn">print</span>(li.<span class="fn">index</span>(${escapeHtml(reprPy(v))}))   <span class="cm"># → ${ix}</span>`;
+          hl = ix;
+          log('mOut', `first ${reprPy(v)} is at index ${ix}.`);
+          setLast(`index(${reprPy(v)}) = ${ix}`); toast(`index = ${ix}`, 'info');
+          break;
+        }
+        case 'len':
+          line = `<span class="fn">print</span>(<span class="fn">len</span>(li))   <span class="cm"># → ${mArr.length}</span>`;
+          log('mOut', `len(li) = ${mArr.length}`);
+          setLast(`len() = ${mArr.length}`); toast(`len = ${mArr.length}`, 'info');
+          break;
+        case 'sort':
+          snapshot(); mArr.sort((a,b)=>(a<b?-1:a>b?1:0)); anim='appearing';
+          line = `li.<span class="fn">sort</span>()   <span class="cm"># → ${escapeHtml(pyListLiteral(mArr))}</span>`;
+          log('mOut','sorted ascending (in-place).');
+          setLast('sort()'); toast('sorted ↑');
+          break;
+        case 'sortDesc':
+          snapshot(); mArr.sort((a,b)=>(a<b?1:a>b?-1:0)); anim='appearing';
+          line = `li.<span class="fn">sort</span>(reverse=<span class="kw">True</span>)   <span class="cm"># → ${escapeHtml(pyListLiteral(mArr))}</span>`;
+          log('mOut','sorted descending (in-place).');
+          setLast('sort(reverse=True)'); toast('sorted ↓');
+          break;
+        case 'reverse':
+          snapshot(); mArr.reverse(); anim='appearing';
+          line = `li.<span class="fn">reverse</span>()   <span class="cm"># → ${escapeHtml(pyListLiteral(mArr))}</span>`;
+          log('mOut','order flipped (in-place).');
+          setLast('reverse()'); toast('reversed');
+          break;
+        case 'clear':
+          snapshot(); mArr = [];
+          line = `li.<span class="fn">clear</span>()   <span class="cm"># → []</span>`;
+          log('mOut','all items removed.');
+          setLast('clear()'); toast('cleared');
+          break;
+        case 'copy':
+          line = `b = li.<span class="fn">copy</span>()   <span class="cm"># b is a NEW list with same items</span>`;
+          log('mOut','copy() returns a shallow copy — changing b does NOT affect li.');
+          setLast('copy()'); toast('copied', 'info');
+          break;
+        case 'reset':
+          mArr = [...PRESETS[mPreset]]; mHistory = []; mUndoStack = [];
+          drawM(null, 'appearing');
+          setLast('reset'); toast('reset');
+          return;
+      }
+      if(line) mHistory.push(line);
+      drawM(hl, anim);
+    }catch(e){ log('mOut','Error: '+e.message,'err'); }
+  };
+});
+drawM(null, 'appearing');
+
+/* ============ + OPERATOR ============ */
+let plusAnimTimer = null;
+function parseCsv(s){
+  return s.split(',').map(x=>{
+    const t = x.trim();
+    if(t==='') return null;
+    const n=Number(t);
+    return isNaN(n)?t:n;
+  }).filter(x=>x!==null);
+}
+function renderPlusCode(a,b,c){
+  const code = document.getElementById('plusCode');
+  code.innerHTML =
+    `a = ${escapeHtml(pyListLiteral(a))}\n`+
+    `b = ${escapeHtml(pyListLiteral(b))}\n`+
+    `c = a + b\n\n`+
+    `<span class="fn">print</span>(c)   <span class="cm"># ${escapeHtml(pyListLiteral(c))}</span>\n`+
+    `<span class="fn">print</span>(a)   <span class="cm"># ${escapeHtml(pyListLiteral(a))}  (unchanged)</span>\n`+
+    `<span class="fn">print</span>(b)   <span class="cm"># ${escapeHtml(pyListLiteral(b))}  (unchanged)</span>`;
+}
+function plusUpdateStats(a,b,c){
+  const set=(id,v)=>{ const e=document.getElementById(id); e.textContent=v; e.classList.remove('bump'); void e.offsetWidth; e.classList.add('bump'); };
+  set('plusLenA', a.length); set('plusLenB', b.length); set('plusLenC', c.length);
+}
+function doPlus(){
+  if(plusAnimTimer){ clearInterval(plusAnimTimer); plusAnimTimer=null; }
+  const a = parseCsv(document.getElementById('plusA').value);
+  const b = parseCsv(document.getElementById('plusB').value);
+  const c = a.concat(b);
+  renderAnimated('plusAViz', a);
+  renderAnimated('plusBViz', b);
+  renderAnimated('plusCViz', c, {sliced: Array.from({length:c.length},(_,i)=>i)});
+  renderPlusCode(a,b,c);
+  plusUpdateStats(a,b,c);
+  clearLog('plusOut');
+  log('plusOut', `c = a + b  →  ${reprList(c)}`);
+  log('plusOut', `len(a) + len(b) = ${a.length} + ${b.length} = ${c.length} = len(c) ✓`);
+}
+function doPlusAnim(){
+  if(plusAnimTimer){ clearInterval(plusAnimTimer); plusAnimTimer=null; document.getElementById('btnPlusAnim').textContent='▶ Merge animation'; return; }
+  const a = parseCsv(document.getElementById('plusA').value);
+  const b = parseCsv(document.getElementById('plusB').value);
+  const c = a.concat(b);
+  renderAnimated('plusAViz', a);
+  renderAnimated('plusBViz', b);
+  renderAnimated('plusCViz', [], {});
+  renderPlusCode(a,b,c);
+  plusUpdateStats(a,b,[]);
+  clearLog('plusOut');
+  const speed = +document.getElementById('plusSpeed').value;
+  let step = 0, partial = [];
+  document.getElementById('btnPlusAnim').textContent = '⏸ Pause';
+  plusAnimTimer = setInterval(()=>{
+    if(step>=c.length){
+      clearInterval(plusAnimTimer); plusAnimTimer=null;
+      document.getElementById('btnPlusAnim').textContent='▶ Merge animation';
+      toast('merge complete ✓');
+      return;
+    }
+    partial.push(c[step]);
+    renderAnimated('plusCViz', partial, {hl:[partial.length-1], anim:'appearing'});
+    plusUpdateStats(a,b,partial);
+    const src = step<a.length?'a':'b';
+    const srcIdx = step<a.length?step:step-a.length;
+    log('plusOut', `c[${step}] ← ${src}[${srcIdx}] = ${repr(c[step])}`);
+    step++;
+  }, speed);
+}
+document.getElementById('btnPlus').onclick = doPlus;
+document.getElementById('btnPlusAnim').onclick = doPlusAnim;
+document.getElementById('btnPlusFruits').onclick = ()=>{
+  document.getElementById('plusA').value = 'apple, banana';
+  document.getElementById('plusB').value = 'cherry, date, fig';
+  doPlus();
+};
+document.getElementById('btnPlusMixed').onclick = ()=>{
+  document.getElementById('plusA').value = '1, hello, 3.14';
+  document.getElementById('plusB').value = 'True, 42';
+  doPlus();
+};
+document.getElementById('btnPlusEmoji').onclick = ()=>{
+  document.getElementById('plusA').value = '🍎, 🍌';
+  document.getElementById('plusB').value = '🍒, 🍇, 🍊';
+  doPlus();
+};
+// live update as user types
+document.getElementById('plusA').addEventListener('input', doPlus);
+document.getElementById('plusB').addEventListener('input', doPlus);
+doPlus();
+
+/* ============ end ============ */
+/* const UNUSED = [
+  { q:`colors = ["red", "green", "blue", "yellow"]\nprint(colors[-2][1])`, choices:['e','blue','l','u'], answer:2,
+    note:`colors[-2] is "blue". "blue"[1] = 'l'.` },
+  { q:`li = [10, 20, 30]\nli[1] = li[1] + li[0]\nprint(li)`, choices:['[10, 30, 30]','[20, 30, 30]','[10, 20, 30, 30]','Error'], answer:0,
+    note:`li[1] becomes 20 + 10 = 30. Result is [10, 30, 30].` },
+  { q:`names = ["A", "B", "C"]\nif "B" in names:\n    for i in range(len(names)-1, -1, -1):\n        print(names[i], end='')`, choices:['ABC','CBA','BCA','CAB'], answer:1,
+    note:`Walks indices 2,1,0 → prints C, B, A.` },
+  { q:`nums = [10, 20, 30, 40, 50, 60]\nprint(nums[2:5])`, choices:['[10, 20, 30]','[30, 40]','[30, 40, 50]','[40, 50, 60]'], answer:2,
+    note:`Indices 2,3,4 (end 5 excluded).` },
+  { q:`letters = ['a','b','c','d','e']\nprint(letters[:2])`, choices:["['c','d','e']","['a','b']","['b','c']",'[]'], answer:1,
+    note:`Start defaults to 0, end=2 excluded.` },
+  { q:`data = [5, 6, 7, 8, 9, 10]\nprint(data[3:])`, choices:['[5,6,7]','[6,7,8]','[8,9]','[8, 9, 10]'], answer:3,
+    note:`Start=3, end defaults to len → [8, 9, 10].` },
+  { q:`nums = [10, 20, 30, 40, 50, 60]\nprint(nums[::3])`, choices:['[20, 40, 60]','[30, 60]','[10, 40]','[10, 40]'], answer:2,
+    note:`Indices 0, 3 → [10, 40].` },
+  { q:`letters = ['a','b','c','d','e','f']\nprint(letters[::-1])`, choices:["['a','b','c','d','e','f']","['f','e','d','c','b','a']","['f','e','d','c','b']","['a','c','e']"], answer:1,
+    note:`Step -1 reverses the list.` },
+  { q:`nums = [1, 2, 3, 4, 5, 6, 7]\nprint(nums[1:6:2])`, choices:['[1,3,5]','[2,3,4,5,6]','[6,4,2]','[2, 4, 6]'], answer:3,
+    note:`Indices 1, 3, 5 → values 2, 4, 6.` },
+  { q:`li = [1, 2, 3]\nli.append('4')\nprint(li)`, choices:["[1, 2, 3, '4']",'[1, 2, 3, 4]','[1, 2, 3, 4, \'4\']','Error'], answer:0,
+    note:`Lists are heterogeneous — string '4' is appended as-is.` },
+  { q:`li = [1, 2]\nprint(li.pop())`, choices:['1','[1]','None','2'], answer:3,
+    note:`pop() removes and returns the last element.` },
+  { q:`li = [1, 3, 4]\nli.insert(0, 2)\nprint(li)`, choices:['[2, 1, 3, 4]','[1, 3, 4, 2]','[1, 2, 3, 4]','[1, 3, 2, 4]'], answer:0,
+    note:`insert(0, 2) places 2 before index 0.` },
+  { q:`li = [1, 2]\nprint(li.remove(2))`, choices:['[1]','None','[1, 2]','Error: remove returns removed element'], answer:1,
+    note:`remove() mutates the list and returns None.` },
+  { q:`a = [1, 2]\na.extend([3])\na.append([4])\nprint(a)`, choices:['[1, 2, 3, 4]','[1, 2, [3], [4]]','[1, 2, 3, [4]]','[1, 2, 3, 4, []]'], answer:2,
+    note:`extend merges items (3), append adds one item ([4]).` },
+];
+
+const quizEl = document.getElementById('quizList');
+let score = 0, answered = new Set();
+QUIZZES.forEach((Q, i)=>{
+  const div = document.createElement('div');
+  div.className = 'quiz-q';
+  div.innerHTML = `
+    <h4>Q${i+1}</h4>
+    <pre class="code">${escapeHtml(Q.q)}</pre>
+    <div class="choices">
+      ${Q.choices.map((c,ci)=>`<button class="choice" data-i="${ci}">${escapeHtml(c)}</button>`).join('')}
+    </div>
+    <div class="feedback"></div>
+  `;
+  quizEl.appendChild(div);
+  const fb = div.querySelector('.feedback');
+  div.querySelectorAll('.choice').forEach(btn=>{
+    btn.onclick = ()=>{
+      if(answered.has(i)) return;
+      const picked = +btn.dataset.i;
+      const correct = picked === Q.answer;
+      div.querySelectorAll('.choice').forEach((b,bi)=>{
+        b.classList.add('disabled');
+        if(bi === Q.answer) b.classList.add('correct');
+      });
+      if(!correct) btn.classList.add('wrong');
+      fb.className = 'feedback '+(correct?'ok':'bad');
+      fb.textContent = (correct?'✓ Correct. ':'✗ Not quite. ') + Q.note;
+      answered.add(i);
+      if(correct) score++;
+      document.getElementById('qScoreBadge').textContent = `${score} / ${QUIZZES.length}`;
+      document.getElementById('qScore').textContent = answered.size===QUIZZES.length
+        ? `All done! Final score ${score} / ${QUIZZES.length}`
+        : `Answered ${answered.size} of ${QUIZZES.length} · Score ${score}`;
+    };
+  });
+});
+*/
+</script>
+</body>
+</html>
